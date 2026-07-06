@@ -1,29 +1,32 @@
-async function uploadData() {
-    const btn = document.getElementById("submitBtn");
-    const name = document.getElementById("name").value;
+async function saveData() {
+    const name = document.getElementById("name").value.trim();
     const status = document.getElementById("status").value;
 
     if (!name) { alert("กรุณากรอกชื่อ-สกุล"); return; }
 
-    btn.innerText = "กำลังบันทึก...";
-    btn.disabled = true;
+    // 1. เช็คชื่อซ้ำก่อน
+    google.script.run.withSuccessHandler(data => {
+        const list = JSON.parse(data);
+        const isDuplicate = list.some(row => row[0] === name); // เช็คว่าชื่อตรงกันไหม
 
-    // URL ล่าสุดจากการ Deploy
-    const URL = "https://script.google.com/macros/s/AKfycbyGaZpXjacnlE2yQgdIfB0LsvWcnwG5FtUeR3WUycs3tcQAvENArPgpPtWwxBBiY7lT/exec"; 
+        if (isDuplicate) {
+            alert("⚠️ แจ้งเตือน: มีรายชื่อนี้อยู่ในระบบแล้ว!");
+            return; // หยุดทำงาน ไม่บันทึก
+        } else {
+            // 2. ถ้าไม่ซ้ำ ให้บันทึก
+            performSave(name, status);
+        }
+    }).doGetRawData();
+}
 
-    try {
-        await fetch(URL, {
-            method: 'POST',
-            mode: 'no-cors',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ name: name, status: status })
-        });
-        alert("บันทึกข้อมูลเรียบร้อย!");
-        document.getElementById("name").value = ""; // เคลียร์ชื่อหลังบันทึก
-    } catch (e) {
-        alert("เกิดข้อผิดพลาด: " + e);
-    } finally {
-        btn.innerText = "บันทึกข้อมูล";
-        btn.disabled = false;
-    }
+async function performSave(name, status) {
+    const isUpdate = document.getElementById("submitBtn").innerText === "บันทึกการแก้ไข";
+    await fetch("URL_ของคุณ_ที่นี่/exec", {
+        method: 'POST',
+        mode: 'no-cors',
+        headers: {'Content-Type': 'application/json'},
+        body: JSON.stringify({ name: name, status: status, action: isUpdate ? "update" : "add" })
+    });
+    alert("บันทึกข้อมูลเรียบร้อย!");
+    document.getElementById("name").value = "";
 }
