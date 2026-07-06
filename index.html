@@ -3,30 +3,22 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>ProJax Pro</title>
+    <title>ProJax Modern System</title>
     <style>
         :root { --primary: #2c3e50; --accent: #27ae60; --bg: #f8f9fa; }
-        body { font-family: 'Kanit', sans-serif; background-color: var(--bg); margin: 0; padding: 20px; }
-        
-        /* Navigation Bar */
-        nav { display: flex; gap: 10px; margin-bottom: 30px; background: #fff; padding: 10px; border-radius: 12px; box-shadow: 0 2px 10px rgba(0,0,0,0.05); }
-        nav button { flex: 1; padding: 12px; border: none; border-radius: 8px; font-size: 16px; cursor: pointer; transition: 0.3s; background: transparent; }
+        body { font-family: 'Kanit', sans-serif; background-color: var(--bg); padding: 20px; max-width: 450px; margin: auto; }
+        .card { background: white; padding: 25px; border-radius: 20px; box-shadow: 0 10px 25px rgba(0,0,0,0.08); }
+        nav { display: flex; gap: 10px; margin-bottom: 25px; }
+        nav button { flex: 1; padding: 12px; border: none; border-radius: 12px; font-size: 16px; cursor: pointer; transition: 0.3s; background: #eee; }
         nav button.active { background: var(--primary); color: white; }
-        
-        /* Form & Input */
         .page { display: none; } .active { display: block; }
-        .card { background: white; padding: 25px; border-radius: 20px; box-shadow: 0 10px 20px rgba(0,0,0,0.05); }
-        h2 { color: var(--primary); margin-top: 0; }
-        input, select { width: 100%; padding: 16px; margin: 12px 0; border: 2px solid #eee; border-radius: 12px; font-size: 16px; box-sizing: border-box; }
-        button#submitBtn { width: 100%; padding: 16px; background: var(--accent); color: white; border: none; border-radius: 12px; font-size: 18px; font-weight: bold; margin-top: 10px; }
-        
-        /* Search Items */
-        .result-item { background: #fff; padding: 20px; margin-bottom: 15px; border-radius: 12px; border-left: 5px solid var(--accent); display: flex; justify-content: space-between; align-items: center; box-shadow: 0 2px 5px rgba(0,0,0,0.03); }
-        .edit-btn { background: #f1f1f1; color: var(--primary); padding: 8px 15px; border-radius: 8px; }
+        input, select { width: 100%; padding: 15px; margin: 10px 0; border: 2px solid #eee; border-radius: 12px; font-size: 16px; box-sizing: border-box; }
+        button#submitBtn { width: 100%; padding: 15px; background: var(--accent); color: white; border: none; border-radius: 12px; font-size: 18px; font-weight: bold; margin-top: 10px; }
+        .result-item { background: #fff; padding: 15px; margin-bottom: 10px; border-radius: 12px; border: 1px solid #eee; display: flex; justify-content: space-between; align-items: center; }
+        .edit-btn { background: var(--primary); color: white; padding: 8px 15px; border-radius: 8px; border: none; cursor: pointer; }
     </style>
 </head>
 <body>
-
     <nav>
         <button id="nav-form" class="active" onclick="showPage('form', 'nav-form')">บันทึก</button>
         <button id="nav-search" onclick="showPage('search', 'nav-search')">ค้นหา</button>
@@ -44,7 +36,7 @@
     </div>
 
     <div id="search" class="page">
-        <input type="text" id="searchBox" oninput="searchData()" placeholder="🔍 ค้นหาด้วยชื่อ...">
+        <input type="text" id="searchBox" oninput="searchData()" placeholder="🔍 ค้นหาชื่อ...">
         <div id="resultContainer"></div>
     </div>
 
