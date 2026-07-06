@@ -1,35 +1,33 @@
-function showPage(pageId) {
-    document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
-    document.getElementById(pageId).classList.add('active');
-}
-
-async function sendDataToSheet() {
+async function uploadData() {
     const btn = document.getElementById("submitBtn");
-    const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbyGaZpXjacnlE2yQgdIfB0LsvWcnwG5FtUeR3WUycs3tcQAvENArPgpPtWwxBBiY7lT/exec";
-    
+    const name = document.getElementById("name").value;
+    const status = document.getElementById("status").value;
+    const file = document.getElementById("imageFile").files[0];
+
+    if (!file || !name) { alert("กรุณากรอกชื่อและเลือกรูปภาพ"); return; }
+
     btn.innerText = "กำลังบันทึก...";
     btn.disabled = true;
 
-    const payload = {
-        name: document.getElementById("name").value,
-        image: document.getElementById("imageLink").value,
-        status: document.getElementById("status").value
-    };
+    // เปลี่ยน URL ตรงนี้ด้วย URL ใหม่ล่าสุดที่ได้จากการกด Deploy > New Version
+    const URL = "https://script.google.com/macros/s/AKfycbyGaZpXjacnlE2yQgdIfB0LsvWcnwG5FtUeR3WUycs3tcQAvENArPgpPtWwxBBiY7lT/exec"; 
 
-    try {
-        await fetch(SCRIPT_URL, {
-            method: 'POST',
-            mode: 'no-cors',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify(payload)
-        });
-        alert("บันทึกสำเร็จ!");
-        document.getElementById("name").value = "";
-        document.getElementById("imageLink").value = "";
-    } catch (e) {
-        alert("ผิดพลาด!");
-    } finally {
-        btn.innerText = "บันทึกข้อมูล";
-        btn.disabled = false;
-    }
+    const reader = new FileReader();
+    reader.readAsDataURL(file);
+    reader.onload = async () => {
+        try {
+            const response = await fetch(URL, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ name: name, image: reader.result, status: status })
+            });
+            alert("บันทึกข้อมูลและอัปโหลดรูปสำเร็จ!");
+            document.getElementById("name").value = "";
+        } catch (e) {
+            alert("เกิดข้อผิดพลาด: " + e);
+        } finally {
+            btn.innerText = "บันทึกข้อมูล";
+            btn.disabled = false;
+        }
+    };
 }

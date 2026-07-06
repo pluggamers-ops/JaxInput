@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <link rel="stylesheet" href="style.css">
-    <title>ProJax Management</title>
+    <title>ProJax Upload</title>
 </head>
 <body>
     <nav>
@@ -15,12 +15,13 @@
     <div id="form" class="page active">
         <h2>กรอกข้อมูลลูกค้า</h2>
         <input type="text" id="name" placeholder="ชื่อ-สกุล">
-        <input type="text" id="imageLink" placeholder="ลิงก์รูปภาพ">
+        <label>เลือกรูปภาพ:</label>
+        <input type="file" id="imageFile" accept="image/*">
         <select id="status">
             <option value="ผ่าน">ผ่าน</option>
             <option value="ไม่ผ่าน">ไม่ผ่าน</option>
         </select>
-        <button id="submitBtn" onclick="sendDataToSheet()">บันทึกข้อมูล</button>
+        <button id="submitBtn" onclick="uploadData()">บันทึกข้อมูล</button>
     </div>
 
     <div id="search" class="page">
@@ -28,7 +29,6 @@
         <input type="text" id="searchBox" placeholder="ค้นหาด้วยชื่อ...">
         <div id="resultContainer"></div>
     </div>
-
     <script src="script.js"></script>
 </body>
 </html>
