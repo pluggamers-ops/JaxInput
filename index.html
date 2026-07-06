@@ -2,25 +2,31 @@
 <html lang="th">
 <head>
     <meta charset="UTF-8">
-    <title>บันทึกข้อมูลลูกค้า</title>
+    <link rel="stylesheet" href="style.css">
+    <title>ProJax Management</title>
 </head>
 <body>
-    <h2>แบบฟอร์มเก็บข้อมูล</h2>
-    
-    <div>
-        <label>ชื่อ-สกุล:</label><br>
-        <input type="text" id="name"><br><br>
-        
-        <label>ลิงก์รูปภาพ (Google Drive):</label><br>
-        <input type="text" id="imageLink"><br><br>
-        
-        <label>สถานะ:</label><br>
+    <nav>
+        <button onclick="showPage('form')">กรอกข้อมูล</button>
+        <button onclick="showPage('search')">ค้นหา</button>
+    </nav>
+
+    <div id="form" class="page active">
+        <h2>กรอกข้อมูลลูกค้า</h2>
+        <input type="text" id="name" placeholder="ชื่อ-สกุล">
+        <label>แนบรูปภาพ:</label>
+        <input type="file" id="imageFile" accept="image/*">
         <select id="status">
             <option value="ผ่าน">ผ่าน</option>
             <option value="ไม่ผ่าน">ไม่ผ่าน</option>
-        </select><br><br>
-        
-        <button onclick="sendDataToSheet()">บันทึกข้อมูล</button>
+        </select>
+        <button id="submitBtn" onclick="uploadData()">บันทึกข้อมูล</button>
+    </div>
+
+    <div id="search" class="page">
+        <h2>ค้นหาข้อมูล</h2>
+        <input type="text" id="searchBox" placeholder="ค้นหาด้วยชื่อ...">
+        <div id="resultContainer"></div>
     </div>
 
     <script src="script.js"></script>
