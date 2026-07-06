@@ -3,35 +3,33 @@ function showPage(pageId) {
     document.getElementById(pageId).classList.add('active');
 }
 
-async function uploadData() {
+async function sendDataToSheet() {
     const btn = document.getElementById("submitBtn");
-    const fileInput = document.getElementById("imageFile");
-    const file = fileInput.files[0];
+    const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbyGaZpXjacnlE2yQgdIfB0LsvWcnwG5FtUeR3WUycs3tcQAvENArPgpPtWwxBBiY7lT/exec";
     
-    if (!file) { alert("กรุณาเลือกรูปภาพ"); return; }
-
-    btn.innerText = "กำลังอัปโหลด...";
+    btn.innerText = "กำลังบันทึก...";
     btn.disabled = true;
 
-    // แปลงไฟล์รูปเป็นข้อความ (Base64) เพื่อส่งเข้า Google Script
-    const reader = new FileReader();
-    reader.readAsDataURL(file);
-    reader.onload = async () => {
-        const payload = {
-            name: document.getElementById("name").value,
-            image: reader.result, // ข้อมูลรูปภาพ
-            status: document.getElementById("status").value
-        };
-
-        try {
-            await fetch("YOUR_SCRIPT_URL_HERE", {
-                method: 'POST',
-                mode: 'no-cors',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify(payload)
-            });
-            alert("บันทึกสำเร็จ!");
-        } catch (e) { alert("ผิดพลาด!"); }
-        finally { btn.innerText = "บันทึกข้อมูล"; btn.disabled = false; }
+    const payload = {
+        name: document.getElementById("name").value,
+        image: document.getElementById("imageLink").value,
+        status: document.getElementById("status").value
     };
+
+    try {
+        await fetch(SCRIPT_URL, {
+            method: 'POST',
+            mode: 'no-cors',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(payload)
+        });
+        alert("บันทึกสำเร็จ!");
+        document.getElementById("name").value = "";
+        document.getElementById("imageLink").value = "";
+    } catch (e) {
+        alert("ผิดพลาด!");
+    } finally {
+        btn.innerText = "บันทึกข้อมูล";
+        btn.disabled = false;
+    }
 }
