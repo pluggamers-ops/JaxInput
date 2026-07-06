@@ -5,11 +5,17 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>ProJax Management</title>
     <style>
-        body { font-family: sans-serif; padding: 20px; max-width: 400px; margin: auto; }
+        /* สไตล์ทั้งหมดถูกฝังไว้ที่นี่เพื่อความชัวร์ */
+        body { font-family: 'Segoe UI', sans-serif; background-color: #f4f7f6; padding: 20px; max-width: 400px; margin: 20px auto; border-radius: 15px; box-shadow: 0 5px 15px rgba(0,0,0,0.1); background-color: #ffffff; }
+        h2 { color: #2c3e50; text-align: center; }
+        nav { display: flex; gap: 10px; margin-bottom: 20px; }
+        nav button { flex: 1; padding: 12px; background-color: #3498db; color: white; border: none; border-radius: 8px; cursor: pointer; transition: 0.3s; }
+        nav button:hover { background-color: #2980b9; }
         .page { display: none; }
         .active { display: block; }
-        input, select, button { width: 100%; padding: 10px; margin: 10px 0; box-sizing: border-box; }
-        nav { display: flex; gap: 10px; margin-bottom: 20px; }
+        input, select, button#submitBtn { width: 100%; padding: 15px; margin: 10px 0; border: 1px solid #ddd; border-radius: 8px; box-sizing: border-box; font-size: 16px; }
+        button#submitBtn { background-color: #27ae60; color: white; font-weight: bold; border: none; cursor: pointer; }
+        button#submitBtn:hover { background-color: #219150; }
     </style>
 </head>
 <body>
@@ -19,7 +25,6 @@
         <button onclick="showPage('search')">ค้นหา</button>
     </nav>
 
-    <!-- หน้ากรอกข้อมูล -->
     <div id="form" class="page active">
         <h2>กรอกข้อมูลลูกค้า</h2>
         <input type="text" id="name" placeholder="ชื่อ-สกุล">
@@ -31,7 +36,6 @@
         <button id="submitBtn" onclick="uploadData()">บันทึกข้อมูล</button>
     </div>
 
-    <!-- หน้าค้นหา -->
     <div id="search" class="page">
         <h2>ค้นหาข้อมูล</h2>
         <input type="text" id="searchBox" placeholder="ค้นหาด้วยชื่อ...">
