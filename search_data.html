@@ -1,0 +1,56 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ค้นหาข้อมูลสถานะ</title>
+    <style>
+        body { font-family: sans-serif; padding: 20px; }
+        .container { max-width: 400px; margin: auto; padding: 20px; border: 1px solid #ccc; border-radius: 8px; }
+        input, button { width: 100%; padding: 10px; margin: 10px 0; box-sizing: border-box; }
+        button { background-color: #007bff; color: white; border: none; cursor: pointer; }
+        button:hover { background-color: #0056b3; }
+        .result-box { margin-top: 15px; padding: 10px; border: 1px solid #eee; background: #f9f9f9; border-radius: 4px; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h2>ค้นหาข้อมูล</h2>
+        <input type="text" id="searchInput" placeholder="พิมพ์ชื่อหรือสถานะเพื่อค้นหา...">
+        <button onclick="searchData()">ค้นหา</button>
+        <div id="results"></div>
+    </div>
+
+    <script>
+        // ใส่ URL ที่คุณส่งมาเรียบร้อยแล้ว
+        const scriptURL = 'https://script.google.com/macros/s/AKfycbyGl_vu958vmtwJ9dHqUTMCScD6mvvxLUZOdqgaaH5EHqdt06iDJTCoNwrlImjSny9r/exec';
+
+        function searchData() {
+            const keyword = document.getElementById('searchInput').value;
+            const resultsDiv = document.getElementById('results');
+            resultsDiv.innerHTML = "กำลังค้นหา...";
+
+            fetch(scriptURL + "?action=search&keyword=" + encodeURIComponent(keyword))
+                .then(response => response.json())
+                .then(data => {
+                    resultsDiv.innerHTML = "";
+                    if(data.length === 0) {
+                        resultsDiv.innerHTML = "<p style='color: gray;'>ไม่พบข้อมูล</p>";
+                        return;
+                    }
+                    data.forEach(item => {
+                        resultsDiv.innerHTML += `
+                            <div class="result-box">
+                                <b>ชื่อ-สกุล:</b> ${item.name}<br>
+                                <b>สถานะ:</b> ${item.status}
+                            </div>`;
+                    });
+                })
+                .catch(error => {
+                    resultsDiv.innerHTML = "<p style='color:red;'>เกิดข้อผิดพลาดในการเชื่อมต่อ</p>";
+                    console.error('Error!', error.message);
+                });
+        }
+    </script>
+</body>
+</html>

@@ -1,0 +1,62 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>เพิ่มข้อมูลสถานะ</title>
+    <style>
+        body { font-family: sans-serif; padding: 20px; }
+        .container { max-width: 400px; margin: auto; padding: 20px; border: 1px solid #ccc; border-radius: 8px; }
+        input, select, button { width: 100%; padding: 10px; margin: 10px 0; box-sizing: border-box; }
+        button { background-color: #28a745; color: white; border: none; cursor: pointer; }
+        button:hover { background-color: #218838; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h2>เพิ่มข้อมูล</h2>
+        <form id="dataForm">
+            <label for="name">ชื่อ-สกุล:</label>
+            <input type="text" id="name" name="name" required>
+
+            <label for="status">สถานะ:</label>
+            <select id="status" name="status" required>
+                <option value="มี">มี</option>
+                <option value="ไม่มี">ไม่มี</option>
+                <option value="อื่นๆ">อื่นๆ</option>
+            </select>
+
+            <button type="submit">บันทึกข้อมูล</button>
+        </form>
+        <p id="statusMessage"></p>
+    </div>
+
+    <script>
+        // ใส่ URL ที่คุณส่งมาเรียบร้อยแล้ว
+        const scriptURL = 'https://script.google.com/macros/s/AKfycbyGl_vu958vmtwJ9dHqUTMCScD6mvvxLUZOdqgaaH5EHqdt06iDJTCoNwrlImjSny9r/exec';
+
+        const form = document.getElementById('dataForm');
+        const statusMessage = document.getElementById('statusMessage');
+
+        form.addEventListener('submit', e => {
+            e.preventDefault();
+            statusMessage.innerText = "กำลังบันทึกข้อมูล...";
+            statusMessage.style.color = "black";
+            
+            const formData = new FormData(form);
+
+            fetch(scriptURL, { method: 'POST', body: formData })
+                .then(response => {
+                    statusMessage.innerText = "บันทึกข้อมูลสำเร็จ!";
+                    statusMessage.style.color = "green";
+                    form.reset();
+                })
+                .catch(error => {
+                    statusMessage.innerText = "เกิดข้อผิดพลาด!";
+                    statusMessage.style.color = "red";
+                    console.error('Error!', error.message);
+                });
+        });
+    </script>
+</body>
+</html>
