@@ -3,58 +3,348 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>เพิ่มข้อมูลสถานะ</title>
+    <title>จัดการข้อมูลสถานะ</title>
+    <link href="https://fonts.googleapis.com/css2?family=Prompt:wght@300;400;500;600;700&display=swap" rel="stylesheet">
     <style>
-        body { font-family: sans-serif; padding: 20px; }
-        .container { max-width: 400px; margin: auto; padding: 20px; border: 1px solid #ccc; border-radius: 8px; }
-        input, select, button { width: 100%; padding: 10px; margin: 10px 0; box-sizing: border-box; }
-        button { background-color: #28a745; color: white; border: none; cursor: pointer; }
-        button:hover { background-color: #218838; }
+        :root {
+            --primary: #5a55d1;
+            --primary-hover: #4a45b8;
+            --success: #10b981;
+            --error: #ef4444;
+            --bg-main: #f8fafd;
+            --text-dark: #1e293b;
+            --text-light: #64748b;
+        }
+        body { font-family: 'Prompt', sans-serif; background: var(--bg-main); margin: 0; padding: 40px 20px; color: var(--text-dark); }
+        
+        .container { 
+            max-width: 650px; margin: auto; background: white; border-radius: 20px; 
+            box-shadow: 0 10px 30px rgba(0,0,0,0.04); overflow: hidden; border: 1px solid #f1f5f9;
+        }
+        
+        /* ปุ่มกลับหน้าหลัก (มุมบนซ้าย) */
+        .back-btn {
+            display: inline-flex; align-items: center; gap: 6px;
+            text-decoration: none; color: var(--text-light); font-size: 14px; font-weight: 600;
+            margin-bottom: 25px; padding: 8px 16px; background-color: #f1f5f9; 
+            border-radius: 8px; transition: all 0.3s;
+        }
+        .back-btn:hover { background-color: var(--primary); color: white; }
+
+        /* ฟอร์ม */
+        .form-section { padding: 40px; border-bottom: 1px solid #f1f5f9; }
+        h2 { margin-top: 0; color: var(--text-dark); font-weight: 700; text-align: center; font-size: 24px; margin-bottom: 25px;}
+        label { font-size: 14px; font-weight: 600; color: var(--text-light); margin-bottom: 8px; display: block; }
+        
+        input, select { 
+            width: 100%; padding: 14px 16px; margin-bottom: 20px; box-sizing: border-box; 
+            border-radius: 12px; border: 1px solid #e2e8f0; font-family: 'Prompt', sans-serif;
+            background-color: #f8fafc; transition: all 0.3s; font-size: 15px; color: var(--text-dark);
+        }
+        input:focus, select:focus { outline: none; border-color: var(--primary); background: white; box-shadow: 0 0 0 4px rgba(90, 85, 209, 0.1); }
+        
+        button { 
+            width: 100%; padding: 14px; border-radius: 12px; border: none; font-family: 'Prompt', sans-serif;
+            font-weight: 600; font-size: 16px; cursor: pointer; transition: all 0.3s; 
+        }
+        #btnSubmit { background-color: var(--primary); color: white; box-shadow: 0 4px 15px rgba(90, 85, 209, 0.2); }
+        #btnSubmit:hover:not(:disabled) { background-color: var(--primary-hover); transform: translateY(-2px); }
+        #btnSubmit:disabled { opacity: 0.7; cursor: not-allowed; transform: none; }
+        #btnCancel { background-color: #f1f5f9; color: var(--text-light); margin-top: 10px; display: none; }
+        #btnCancel:hover { background-color: #e2e8f0; }
+
+        /* ส่วนแสดงผล */
+        .list-container { padding: 40px; background: #fafcff; }
+        .search-box { display: flex; gap: 10px; margin-bottom: 25px; }
+        .search-box input { margin-bottom: 0; }
+        #btnSearch { width: auto; padding: 0 25px; background-color: white; color: var(--primary); border: 1px solid var(--primary); box-shadow: none; }
+        #btnSearch:hover { background-color: var(--primary); color: white; }
+        
+        .list-section { max-height: 400px; overflow-y: auto; padding-right: 10px; }
+        .list-section::-webkit-scrollbar { width: 6px; }
+        .list-section::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 10px; }
+        
+        .data-row { 
+            display: flex; justify-content: space-between; align-items: center; 
+            padding: 16px 20px; background: white; margin-bottom: 12px; 
+            border-radius: 12px; border: 1px solid #e2e8f0; transition: all 0.2s;
+        }
+        .data-row:hover { border-color: #cbd5e1; box-shadow: 0 4px 10px rgba(0,0,0,0.02); }
+        .data-info strong { font-size: 15px; color: var(--text-dark); display: block; margin-bottom: 6px; }
+        
+        .btn-edit { 
+            width: auto; padding: 8px 16px; background-color: #f1f5f9; color: var(--text-light); 
+            font-size: 13px; border-radius: 8px; font-weight: 500;
+        }
+        .btn-edit:hover { background-color: var(--primary); color: white; }
+        
+        .status-badge { display: inline-block; padding: 4px 12px; border-radius: 20px; font-size: 12px; font-weight: 600; }
+        .status-มี { background-color: #dcfce7; color: #166534; }
+        .status-ไม่มี { background-color: #fee2e2; color: #991b1b; }
+        .status-อื่นๆ { background-color: #f1f5f9; color: #475569; }
+
+        /* -------------------------------------- */
+        /* Modal Pop-up + แอนิเมชันวาดเส้น SVG ขั้นสูง */
+        /* -------------------------------------- */
+        .modal-overlay {
+            display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+            background: rgba(15, 23, 42, 0.4); justify-content: center; align-items: center; z-index: 1000;
+            backdrop-filter: blur(4px);
+        }
+        
+        @keyframes popUpContainer {
+            from { transform: scale(0.9) translateY(15px); opacity: 0; }
+            to { transform: scale(1) translateY(0); opacity: 1; }
+        }
+
+        .modal-overlay.show { display: flex; animation: fadeIn 0.2s ease forwards; }
+        .modal-overlay.show .modal-content { animation: popUpContainer 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards; }
+
+        .modal-content {
+            background: white; padding: 45px 30px; border-radius: 20px; text-align: center;
+            width: 90%; max-width: 380px; box-shadow: 0 20px 40px rgba(0,0,0,0.15);
+        }
+        
+        .modal-title { font-size: 22px; font-weight: 700; color: var(--text-dark); margin: 0 0 10px 0; }
+        .modal-text { font-size: 15px; color: var(--text-light); margin: 0 0 35px 0; line-height: 1.5; }
+        .btn-modal-ok { 
+            background-color: var(--primary); color: white; width: auto; padding: 12px 45px; 
+            display: inline-block; transition: all 0.3s; 
+        }
+        .btn-modal-ok:hover { transform: translateY(-2px); box-shadow: 0 4px 10px rgba(90, 85, 209, 0.3); }
+
+        .modal-icon-wrapper { width: 85px; height: 85px; margin: 0 auto 25px auto; }
+        .svg-anim { width: 100%; height: 100%; display: block; }
+        
+        .svg-circle { 
+            stroke-width: 3.5; fill: none; stroke-linecap: round;
+            stroke-dasharray: 160; stroke-dashoffset: 160; 
+        }
+        .show .svg-circle { animation: drawLine 0.6s ease-out forwards; }
+        
+        .svg-inner-path { 
+            stroke-width: 4; fill: none; stroke-linecap: round; stroke-linejoin: round;
+            stroke-dasharray: 60; stroke-dashoffset: 60; 
+        }
+        .show .svg-inner-path { animation: drawLine 0.4s ease-out 0.4s forwards; }
+        
+        .svg-dot { opacity: 0; }
+        .show .svg-dot { animation: fadeInScale 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275) 0.6s forwards; }
+
+        @keyframes drawLine { 100% { stroke-dashoffset: 0; } }
+        @keyframes fadeInScale { 0% { opacity: 0; transform: scale(0); } 100% { opacity: 1; transform: scale(1); } }
+        @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+
+        .stroke-success { stroke: var(--success); }
+        .stroke-warning { stroke: var(--primary); }
+        .fill-warning { fill: var(--primary); transform-origin: 26px 38px; }
+        .stroke-error { stroke: var(--error); }
     </style>
 </head>
 <body>
     <div class="container">
-        <h2>เพิ่มข้อมูล</h2>
-        <form id="dataForm">
-            <label for="name">ชื่อ-สกุล:</label>
-            <input type="text" id="name" name="name" required>
+        <div class="form-section">
+            <a href="index.html" class="back-btn">&larr; กลับหน้าเมนูหลัก</a>
+            
+            <h2 id="formTitle">เพิ่มข้อมูลใหม่</h2>
+            <form id="dataForm">
+                <input type="hidden" id="rowIndex" name="rowIndex">
+                
+                <label for="name">ชื่อ-สกุล</label>
+                <input type="text" id="name" name="name" required>
 
-            <label for="status">สถานะ:</label>
-            <select id="status" name="status" required>
-                <option value="มี">มี</option>
-                <option value="ไม่มี">ไม่มี</option>
-                <option value="อื่นๆ">อื่นๆ</option>
-            </select>
+                <label for="status">สถานะ</label>
+                <select id="status" name="status" required>
+                    <option value="มี">มี</option>
+                    <option value="ไม่มี">ไม่มี</option>
+                    <option value="อื่นๆ">อื่นๆ</option>
+                </select>
 
-            <button type="submit">บันทึกข้อมูล</button>
-        </form>
-        <p id="statusMessage"></p>
+                <button type="submit" id="btnSubmit">บันทึกข้อมูล</button>
+                <button type="button" id="btnCancel" onclick="cancelEdit()">ยกเลิกการแก้ไข</button>
+            </form>
+        </div>
+
+        <div class="list-container">
+            <h3 style="margin-top: 0; margin-bottom: 20px; color: var(--text-dark);">รายชื่อทั้งหมด</h3>
+            <div class="search-box">
+                <input type="text" id="searchInput" placeholder="พิมพ์ชื่อเพื่อค้นหา...">
+                <button id="btnSearch" onclick="loadData()">ค้นหา</button>
+            </div>
+            
+            <div class="list-section" id="dataList">
+                <p style="text-align: center; color: var(--text-light); padding: 20px 0;">กำลังโหลดข้อมูล...</p>
+            </div>
+        </div>
+    </div>
+
+    <div id="dynamicModal" class="modal-overlay">
+        <div class="modal-content">
+            <div id="modalIconWrapper" class="modal-icon-wrapper"></div>
+            <h3 id="modalTitle" class="modal-title">...</h3>
+            <p id="modalDescription" class="modal-text">...</p>
+            <button class="btn-modal-ok" onclick="closeModal()">OK</button>
+        </div>
     </div>
 
     <script>
-        // ใส่ URL ที่คุณส่งมาเรียบร้อยแล้ว
         const scriptURL = 'https://script.google.com/macros/s/AKfycbyGl_vu958vmtwJ9dHqUTMCScD6mvvxLUZOdqgaaH5EHqdt06iDJTCoNwrlImjSny9r/exec';
+        let allData = []; 
 
-        const form = document.getElementById('dataForm');
-        const statusMessage = document.getElementById('statusMessage');
+        window.onload = loadData;
 
-        form.addEventListener('submit', e => {
-            e.preventDefault();
-            statusMessage.innerText = "กำลังบันทึกข้อมูล...";
-            statusMessage.style.color = "black";
+        // คลังแสงไอคอน SVG แบบมีแอนิเมชันวาดเส้น
+        const svgIcons = {
+            success: `
+                <svg class="svg-anim" viewBox="0 0 52 52">
+                    <circle class="svg-circle stroke-success" cx="26" cy="26" r="24"/>
+                    <path class="svg-inner-path stroke-success" d="M14 27 l 7 7 l 16 -16"/>
+                </svg>
+            `,
+            warning: `
+                <svg class="svg-anim" viewBox="0 0 52 52">
+                    <circle class="svg-circle stroke-warning" cx="26" cy="26" r="24"/>
+                    <path class="svg-inner-path stroke-warning" d="M26 14 v 16"/>
+                    <circle class="svg-dot fill-warning" cx="26" cy="38" r="2.5"/>
+                </svg>
+            `,
+            error: `
+                <svg class="svg-anim" viewBox="0 0 52 52">
+                    <circle class="svg-circle stroke-error" cx="26" cy="26" r="24"/>
+                    <path class="svg-inner-path stroke-error" d="M16 16 l 20 20"/>
+                    <path class="svg-inner-path stroke-error" style="animation-delay: 0.5s;" d="M36 16 l -20 20"/>
+                </svg>
+            `
+        };
+
+        function showModal(type, title, description) {
+            const overlay = document.getElementById('dynamicModal');
             
-            const formData = new FormData(form);
+            document.getElementById('modalTitle').innerText = title;
+            document.getElementById('modalDescription').innerText = description;
+            overlay.classList.remove('show');
+            
+            let iconType = type === 'duplicate' ? 'warning' : type;
+            document.getElementById('modalIconWrapper').innerHTML = svgIcons[iconType];
+
+            setTimeout(() => { overlay.classList.add('show'); }, 10);
+        }
+
+        function closeModal() {
+            const overlay = document.getElementById('dynamicModal');
+            overlay.style.animation = "fadeIn 0.2s ease reverse forwards";
+            overlay.querySelector('.modal-content').style.animation = "popUpContainer 0.2s ease reverse forwards";
+            
+            setTimeout(() => {
+                overlay.classList.remove('show');
+                overlay.style.animation = "";
+                overlay.querySelector('.modal-content').style.animation = "";
+            }, 200);
+        }
+
+        function loadData() {
+            const listDiv = document.getElementById('dataList');
+            const keyword = document.getElementById('searchInput').value.trim().toLowerCase();
+            
+            if (allData.length === 0 || keyword === "") {
+                listDiv.innerHTML = "<p style='text-align: center; color: var(--text-light); padding: 20px 0;'>กำลังโหลดข้อมูล...</p>";
+                fetch(scriptURL + "?action=getAll")
+                    .then(res => res.json())
+                    .then(data => {
+                        allData = data;
+                        displayData(allData, keyword);
+                    })
+                    .catch(err => {
+                        listDiv.innerHTML = "<p style='color:#ef4444; text-align: center;'>เกิดข้อผิดพลาดในการเชื่อมต่อข้อมูล</p>";
+                    });
+            } else {
+                displayData(allData, keyword);
+            }
+        }
+
+        function displayData(dataArray, keyword) {
+            const listDiv = document.getElementById('dataList');
+            listDiv.innerHTML = "";
+            const filteredData = dataArray.filter(item => item.name.toLowerCase().includes(keyword));
+
+            if(filteredData.length === 0) {
+                listDiv.innerHTML = "<p style='text-align: center; color: var(--text-light); padding: 20px 0;'>ไม่พบรายชื่อที่ค้นหา</p>";
+                return;
+            }
+
+            filteredData.forEach(item => {
+                const statusClass = item.status === 'มี' ? 'status-มี' : (item.status === 'ไม่มี' ? 'status-ไม่มี' : 'status-อื่นๆ');
+                listDiv.innerHTML += `
+                    <div class="data-row">
+                        <div class="data-info">
+                            <strong>${item.name}</strong>
+                            <span class="status-badge ${statusClass}">${item.status}</span>
+                        </div>
+                        <button class="btn-edit" onclick="setupEdit('${item.rowIndex}', '${item.name}', '${item.status}')">แก้ไข</button>
+                    </div>
+                `;
+            });
+        }
+
+        function setupEdit(rowIndex, name, status) {
+            document.getElementById('formTitle').innerText = "แก้ไขข้อมูล";
+            document.getElementById('rowIndex').value = rowIndex;
+            document.getElementById('name').value = name;
+            document.getElementById('status').value = status;
+            
+            let btn = document.getElementById('btnSubmit');
+            btn.innerText = "อัปเดตข้อมูล";
+            btn.style.backgroundColor = "#f59e0b"; 
+            
+            document.getElementById('btnCancel').style.display = "block"; 
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+        }
+
+        function cancelEdit() {
+            document.getElementById('dataForm').reset();
+            document.getElementById('formTitle').innerText = "เพิ่มข้อมูลใหม่";
+            document.getElementById('rowIndex').value = "";
+            
+            let btn = document.getElementById('btnSubmit');
+            btn.innerText = "บันทึกข้อมูล";
+            btn.style.backgroundColor = "var(--primary)";
+            btn.disabled = false;
+            
+            document.getElementById('btnCancel').style.display = "none";
+        }
+
+        document.getElementById('dataForm').addEventListener('submit', e => {
+            e.preventDefault();
+            const btnSubmit = document.getElementById('btnSubmit');
+            let isEditing = document.getElementById('rowIndex').value !== "";
+            const nameInput = document.getElementById('name').value.trim();
+            
+            if (!isEditing) {
+                const existingData = allData.find(item => item.name.trim().toLowerCase() === nameInput.toLowerCase());
+                if (existingData) {
+                    showModal('duplicate', 'ข้อมูลซ้ำ', `"${existingData.name}" มีข้อมูลในระบบเรียบร้อยแล้ว ไม่สามารถเพิ่มซ้ำได้ครับ`);
+                    return; 
+                }
+            }
+
+            const originalBtnText = btnSubmit.innerText;
+            btnSubmit.innerText = isEditing ? "กำลังอัปเดต..." : "กำลังบันทึก...";
+            btnSubmit.disabled = true;
+            
+            const formData = new FormData(document.getElementById('dataForm'));
+            formData.append('action', isEditing ? 'edit' : 'add');
 
             fetch(scriptURL, { method: 'POST', body: formData })
                 .then(response => {
-                    statusMessage.innerText = "บันทึกข้อมูลสำเร็จ!";
-                    statusMessage.style.color = "green";
-                    form.reset();
+                    showModal('success', 'สำเร็จ!', isEditing ? 'อัปเดตข้อมูลเรียบร้อยแล้ว' : 'บันทึกข้อมูลใหม่เรียบร้อยแล้ว');
+                    cancelEdit(); 
+                    allData = []; 
+                    loadData();   
                 })
                 .catch(error => {
-                    statusMessage.innerText = "เกิดข้อผิดพลาด!";
-                    statusMessage.style.color = "red";
-                    console.error('Error!', error.message);
+                    btnSubmit.innerText = originalBtnText;
+                    btnSubmit.disabled = false;
+                    showModal('error', 'ข้อผิดพลาด', 'เกิดข้อผิดพลาดในการเชื่อมต่อ กรุณาลองใหม่อีกครั้ง');
                 });
         });
     </script>

@@ -4,53 +4,130 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>ค้นหาข้อมูลสถานะ</title>
+    <link href="https://fonts.googleapis.com/css2?family=Prompt:wght@300;400;500;600;700&display=swap" rel="stylesheet">
     <style>
-        body { font-family: sans-serif; padding: 20px; }
-        .container { max-width: 400px; margin: auto; padding: 20px; border: 1px solid #ccc; border-radius: 8px; }
-        input, button { width: 100%; padding: 10px; margin: 10px 0; box-sizing: border-box; }
-        button { background-color: #007bff; color: white; border: none; cursor: pointer; }
-        button:hover { background-color: #0056b3; }
-        .result-box { margin-top: 15px; padding: 10px; border: 1px solid #eee; background: #f9f9f9; border-radius: 4px; }
+        :root {
+            --primary: #5a55d1;
+            --bg-main: #f8fafd;
+            --text-dark: #1e293b;
+            --text-light: #64748b;
+        }
+        body { font-family: 'Prompt', sans-serif; background: var(--bg-main); margin: 0; padding: 40px 20px; color: var(--text-dark); }
+        
+        .container { 
+            max-width: 650px; margin: auto; background: white; border-radius: 20px; 
+            box-shadow: 0 10px 30px rgba(0,0,0,0.04); padding: 40px; border: 1px solid #f1f5f9;
+        }
+
+        /* ปุ่มกลับหน้าหลัก (มุมบนซ้าย) */
+        .back-btn {
+            display: inline-flex; align-items: center; gap: 6px;
+            text-decoration: none; color: var(--text-light); font-size: 14px; font-weight: 600;
+            margin-bottom: 25px; padding: 8px 16px; background-color: #f1f5f9; 
+            border-radius: 8px; transition: all 0.3s;
+        }
+        .back-btn:hover { background-color: var(--primary); color: white; }
+
+        h2 { margin-top: 0; color: var(--text-dark); font-weight: 700; text-align: center; font-size: 24px; margin-bottom: 30px;}
+        
+        .search-box { display: flex; gap: 10px; margin-bottom: 30px; }
+        input { 
+            flex-grow: 1; padding: 14px 16px; border-radius: 12px; border: 1px solid #e2e8f0; 
+            font-family: 'Prompt', sans-serif; background-color: #f8fafc; font-size: 15px; transition: all 0.3s;
+        }
+        input:focus { outline: none; border-color: var(--primary); background: white; box-shadow: 0 0 0 4px rgba(90, 85, 209, 0.1); }
+        
+        button { 
+            padding: 0 30px; border-radius: 12px; border: none; font-family: 'Prompt', sans-serif;
+            font-weight: 600; font-size: 15px; cursor: pointer; transition: all 0.3s; 
+            background-color: var(--primary); color: white; box-shadow: 0 4px 15px rgba(90, 85, 209, 0.2);
+        }
+        button:hover { transform: translateY(-2px); filter: brightness(1.1); }
+        
+        .list-section { max-height: 500px; overflow-y: auto; padding-right: 10px; }
+        .list-section::-webkit-scrollbar { width: 6px; }
+        .list-section::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 10px; }
+        
+        .data-row { 
+            padding: 18px 20px; background: white; margin-bottom: 12px; 
+            border-radius: 12px; border: 1px solid #e2e8f0; 
+            display: flex; justify-content: space-between; align-items: center; transition: all 0.2s;
+        }
+        .data-row:hover { border-color: #cbd5e1; box-shadow: 0 4px 10px rgba(0,0,0,0.02); }
+        .name-text { font-size: 16px; font-weight: 600; color: var(--text-dark); }
+        
+        .status-badge { display: inline-block; padding: 5px 14px; border-radius: 20px; font-size: 13px; font-weight: 600; }
+        .status-มี { background-color: #dcfce7; color: #166534; }
+        .status-ไม่มี { background-color: #fee2e2; color: #991b1b; }
+        .status-อื่นๆ { background-color: #f1f5f9; color: #475569; }
     </style>
 </head>
 <body>
     <div class="container">
-        <h2>ค้นหาข้อมูล</h2>
-        <input type="text" id="searchInput" placeholder="พิมพ์ชื่อหรือสถานะเพื่อค้นหา...">
-        <button onclick="searchData()">ค้นหา</button>
-        <div id="results"></div>
+        <a href="index.html" class="back-btn">&larr; กลับหน้าเมนูหลัก</a>
+        
+        <h2>🔍 ค้นหาข้อมูลสถานะ</h2>
+        
+        <div class="search-box">
+            <input type="text" id="searchInput" placeholder="พิมพ์ชื่อเพื่อค้นหา...">
+            <button onclick="loadData()">ค้นหา</button>
+        </div>
+        
+        <div class="list-section" id="dataList">
+            <p style="text-align: center; color: var(--text-light); padding: 20px 0;">กำลังโหลดข้อมูล...</p>
+        </div>
     </div>
 
     <script>
-        // ใส่ URL ที่คุณส่งมาเรียบร้อยแล้ว
         const scriptURL = 'https://script.google.com/macros/s/AKfycbyGl_vu958vmtwJ9dHqUTMCScD6mvvxLUZOdqgaaH5EHqdt06iDJTCoNwrlImjSny9r/exec';
+        let allData = []; 
 
-        function searchData() {
-            const keyword = document.getElementById('searchInput').value;
-            const resultsDiv = document.getElementById('results');
-            resultsDiv.innerHTML = "กำลังค้นหา...";
+        window.onload = loadData;
 
-            fetch(scriptURL + "?action=search&keyword=" + encodeURIComponent(keyword))
-                .then(response => response.json())
-                .then(data => {
-                    resultsDiv.innerHTML = "";
-                    if(data.length === 0) {
-                        resultsDiv.innerHTML = "<p style='color: gray;'>ไม่พบข้อมูล</p>";
-                        return;
-                    }
-                    data.forEach(item => {
-                        resultsDiv.innerHTML += `
-                            <div class="result-box">
-                                <b>ชื่อ-สกุล:</b> ${item.name}<br>
-                                <b>สถานะ:</b> ${item.status}
-                            </div>`;
+        function loadData() {
+            const listDiv = document.getElementById('dataList');
+            const keyword = document.getElementById('searchInput').value.trim().toLowerCase();
+            
+            if (allData.length === 0) {
+                listDiv.innerHTML = "<p style='text-align: center; color: var(--text-light); padding: 20px 0;'>กำลังโหลดข้อมูล...</p>";
+                fetch(scriptURL + "?action=getAll")
+                    .then(res => res.json())
+                    .then(data => {
+                        allData = data; 
+                        displayData(allData, keyword);
+                    })
+                    .catch(err => {
+                        listDiv.innerHTML = "<p style='color:#ef4444; text-align: center;'>เกิดข้อผิดพลาดในการเชื่อมต่อข้อมูล</p>";
                     });
-                })
-                .catch(error => {
-                    resultsDiv.innerHTML = "<p style='color:red;'>เกิดข้อผิดพลาดในการเชื่อมต่อ</p>";
-                    console.error('Error!', error.message);
-                });
+            } else {
+                displayData(allData, keyword);
+            }
         }
+
+        function displayData(dataArray, keyword) {
+            const listDiv = document.getElementById('dataList');
+            listDiv.innerHTML = "";
+            const filteredData = dataArray.filter(item => item.name.toLowerCase().includes(keyword));
+
+            if(filteredData.length === 0) {
+                listDiv.innerHTML = "<p style='text-align: center; color: var(--text-light); padding: 20px 0;'>ไม่พบรายชื่อที่ค้นหา</p>";
+                return;
+            }
+
+            filteredData.forEach(item => {
+                const statusClass = item.status === 'มี' ? 'status-มี' : (item.status === 'ไม่มี' ? 'status-ไม่มี' : 'status-อื่นๆ');
+                listDiv.innerHTML += `
+                    <div class="data-row">
+                        <span class="name-text">${item.name}</span>
+                        <span class="status-badge ${statusClass}">${item.status}</span>
+                    </div>
+                `;
+            });
+        }
+
+        document.getElementById('searchInput').addEventListener('keypress', function (e) {
+            if (e.key === 'Enter') loadData();
+        });
     </script>
 </body>
 </html>

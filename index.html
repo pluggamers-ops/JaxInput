@@ -4,28 +4,86 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>หน้าแรก - ระบบจัดการข้อมูล</title>
+    <link href="https://fonts.googleapis.com/css2?family=Prompt:wght@300;400;500;600;700&display=swap" rel="stylesheet">
     <style>
-        body { font-family: sans-serif; padding: 20px; text-align: center; background-color: #f4f4f9; }
-        .container { max-width: 400px; margin: auto; padding: 30px; border: 1px solid #ddd; border-radius: 8px; background-color: #ffffff; box-shadow: 0 4px 8px rgba(0,0,0,0.1); }
-        h2 { color: #333; margin-bottom: 5px; }
-        p { color: #666; margin-bottom: 25px; }
-        a { display: block; padding: 15px; margin: 15px 0; color: white; text-decoration: none; border-radius: 5px; font-weight: bold; font-size: 16px; transition: background-color 0.3s; }
-        .btn-add { background-color: #28a745; }
-        .btn-add:hover { background-color: #218838; }
-        .btn-search { background-color: #007bff; }
-        .btn-search:hover { background-color: #0056b3; }
+        :root {
+            --primary: #5a55d1;
+            --bg-main: #f8fafd;
+            --text-dark: #1e293b;
+            --text-light: #64748b;
+        }
+        body {
+            font-family: 'Prompt', sans-serif;
+            background-color: var(--bg-main);
+            margin: 0;
+            padding: 40px 20px;
+            color: var(--text-dark);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+        
+        .header-section { text-align: center; margin-bottom: 50px; max-width: 800px; }
+        .main-icon {
+            width: 70px; height: 70px; background-color: var(--primary); color: white;
+            border-radius: 20px; display: flex; justify-content: center; align-items: center;
+            font-size: 30px; margin: 0 auto 20px auto; box-shadow: 0 10px 25px rgba(90, 85, 209, 0.3);
+        }
+        h1 { font-size: 28px; font-weight: 700; margin: 0 0 10px 0; color: #0f172a; }
+        .subtitle { font-size: 15px; color: var(--text-light); line-height: 1.6; margin: 0; font-weight: 300;}
+
+        .card-grid { display: flex; gap: 30px; justify-content: center; flex-wrap: wrap; max-width: 800px; }
+        
+        .card {
+            background: white; border-radius: 20px; padding: 40px 30px; width: 260px;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.03); text-decoration: none; color: var(--text-dark);
+            transition: all 0.3s ease; border: 1px solid #f1f5f9; display: flex; flex-direction: column;
+        }
+        .card:hover { 
+            transform: translateY(-5px); 
+            box-shadow: 0 15px 30px rgba(0,0,0,0.08); 
+            border-top: 4px solid var(--primary); 
+            padding-top: 36px; 
+        }
+        
+        .card-icon {
+            width: 50px; height: 50px; background-color: #f1f5f9; color: var(--primary);
+            border-radius: 14px; display: flex; justify-content: center; align-items: center;
+            font-size: 24px; margin-bottom: 25px; transition: all 0.3s;
+        }
+        .card:hover .card-icon { background-color: var(--primary); color: white; }
+        
+        .card h3 { font-size: 18px; font-weight: 600; margin: 0 0 15px 0; transition: color 0.3s; }
+        .card:hover h3 { color: var(--primary); }
+        
+        .card p { font-size: 13px; color: var(--text-light); line-height: 1.6; margin: 0 0 30px 0; flex-grow: 1; }
+        
+        .card-link { font-size: 14px; font-weight: 600; color: var(--primary); display: flex; align-items: center; gap: 5px; }
     </style>
 </head>
 <body>
-    <div class="container">
-        <h2>ระบบสถานะ</h2>
-        <p>กรุณาเลือกรายการที่ต้องการใช้งาน</p>
-        
-        <!-- ลิงก์ไปยังหน้าเพิ่มข้อมูล -->
-        <a href="add_data.html" class="btn-add">➕ เพิ่มข้อมูลสถานะ</a>
-        
-        <!-- ลิงก์ไปยังหน้าค้นหาข้อมูล -->
-        <a href="search_data.html" class="btn-search">🔍 ค้นหาข้อมูลสถานะ</a>
+
+    <div class="header-section">
+        <div class="main-icon">📋</div>
+        <h1>ระบบสถานะ</h1>
+        <p class="subtitle">กรุณาเลือกรายการที่ต้องการใช้งาน</p>
     </div>
+
+    <div class="card-grid">
+        <a href="search_data.html" class="card">
+            <div class="card-icon">🔍</div>
+            <h3>ค้นหาข้อมูลสถานะ</h3>
+            <p>พิมพ์ชื่อเพื่อค้นหาและตรวจสอบสถานะข้อมูลที่มีอยู่ในระบบ</p>
+            <div class="card-link">เข้าสู่หน้าค้นหา &rsaquo;</div>
+        </a>
+
+        <a href="add_data.html" class="card">
+            <div class="card-icon">📝</div>
+            <h3>เพิ่มข้อมูลสถานะ</h3>
+            <p>กรอกข้อมูลใหม่เข้าสู่ระบบ หรืออัปเดตสถานะของรายชื่อที่มีอยู่แล้ว</p>
+            <div class="card-link">เข้าสู่หน้าเพิ่มข้อมูล &rsaquo;</div>
+        </a>
+    </div>
+
 </body>
 </html>
